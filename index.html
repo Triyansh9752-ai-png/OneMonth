@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Happy One Month, Baby!</title>
+  <link rel="icon" type="image/png" href="heart-favicon.png" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background: linear-gradient(to top right, #fff0f5, #ffe4e1);
+      overflow-x: hidden;
+      margin: 0;
+    }
+    .emoji {
+      position: absolute;
+      font-size: 1.5rem;
+      animation: fall linear infinite;
+      opacity: 0.8;
+    }
+    @keyframes fall {
+      0% {
+        transform: translateY(-100px) rotate(0deg);
+        opacity: 0;
+      }
+      50% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(110vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
+    @keyframes pop {
+      0% { transform: scale(0.8); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+    @keyframes slideIn {
+      0% { transform: translateY(100px); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+    @keyframes explode {
+      0% { transform: scale(1); opacity: 1; }
+      100% { transform: scale(1.5); opacity: 0; }
+    }
+    @keyframes fadeOut {
+      0% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+    @keyframes typewriter {
+      from { width: 0; }
+      to { width: 100%; }
+    }
+    .reason-card {
+      position: relative;
+      cursor: pointer;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s, transform 0.5s;
+    }
+    .reason-card.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .reason-card::before {
+      content: '💗';
+      position: absolute;
+      top: -10px;
+      left: -10px;
+      font-size: 1.2rem;
+      color: #ec4899;
+    }
+    .scroll-container {
+      scroll-behavior: smooth;
+      position: relative;
+    }
+    .nav-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      transition: opacity 0.3s;
+      opacity: 0;
+    }
+    .scroll-container:hover .nav-arrow {
+      opacity: 1;
+    }
+    .pop-animation {
+      animation: pop 0.3s ease-out;
+    }
+    #introPage {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(to bottom, #ffccd5, #fff0f5);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+      transition: opacity 0.5s ease-out;
+    }
+    #introPage.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+    #heart {
+      font-size: 10rem;
+      color: #ec4899;
+      animation: pulse 1.5s infinite;
+      cursor: pointer;
+      text-shadow: 0 0 20px rgba(236, 72, 153, 0.5);
+    }
+    #mainContent {
+      opacity: 0;
+      transform: translateY(100px);
+      transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+      position: relative;
+    }
+    #mainContent.visible {
+      opacity: 1;
+      transform: translateY(0);
+      animation: slideIn 0.5s ease-out;
+    }
+    .heart-particle {
+      position: absolute;
+      color: #ec4899;
+      font-size: 1rem;
+      animation: explode 1s ease-out forwards;
+    }
+    #loadingMessage {
+      position: absolute;
+      top: 50%;
+      transform: translateY(100px);
+      color: #ec4899;
+      font-size: 1.5rem;
+      font-weight: 600;
+      opacity: 0;
+      transition: opacity 0.5s;
+    }
+    #loadingMessage.visible {
+      opacity: 1;
+    }
+    #welcomeMessage {
+      position: absolute;
+      top: 10px;
+      width: 100%;
+      text-align: center;
+      color: #ec4899;
+      font-size: 1.5rem;
+      font-weight: 600;
+      opacity: 0;
+      transition: opacity 0.5s;
+    }
+    #welcomeMessage.visible {
+      opacity: 1;
+    }
+    #confettiCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      z-index: 50;
+    }
+    #letterText {
+      overflow: hidden;
+      white-space: nowrap;
+      border-right: 2px solid #ec4899;
+      animation: typewriter 4s steps(40) 1;
+    }
+    #letterCanvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body class="relative">
+  <!-- Intro Page -->
+  <div id="introPage">
+    <div id="heart" aria-label="Tap to start">💗</div>
+    <p class="text-2xl text-pink-600 font-semibold mt-4">Tap the Heart, Baby 💗</p>
+    <div id="loadingMessage" class="hidden">Crafting our love story, Akshu...</div>
+  </div>
+  <!-- Main Content -->
+  <div id="mainContent">
+    <div id="welcomeMessage" class="hidden">Akshu, this is our love story 💗</div>
+    <canvas id="confettiCanvas"></canvas>
+    <!-- Falling emojis -->
+    <script>
+      const emojis = ['💖','❤️','💞','❣️','💗'];
+      for (let i = 0; i < 50; i++) {
+        const emoji = document.createElement('div');
+        emoji.className = 'emoji';
+        emoji.style.left = Math.random() * 100 + 'vw';
+        emoji.style.top = '-' + Math.random() * 100 + 'px';
+        emoji.style.animationDuration = 4 + Math.random() * 5 + 's';
+        emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        document.body.appendChild(emoji);
+      }
+    </script>
+    <div class="max-w-2xl mx-auto p-6 relative z-10">
+      <header class="text-center py-10">
+        <h1 class="text-4xl font-bold text-pink-600 hover:scale-105 transition-transform duration-300">Happy One Month, Baby!</h1>
+        <p class="mt-2 text-lg text-gray-700">From far away but always close to my heart.</p>
+      </header>
+      <section class="mb-8">
+        <h2 class="text-2xl font-semibold text-pink-500 mb-4">Our Little Journey</h2>
+        <div class="bg-pink-100 p-4 rounded-xl mb-2 shadow hover:bg-pink-200 transition duration-300">March 19: We began something beautiful.</div>
+        <div class="bg-pink-100 p-4 rounded-xl mb-2 shadow hover:bg-pink-200 transition duration-300">March 26: Our first video call — I still smile thinking about it.</div>
+        <div class="bg-pink-100 p-4 rounded-xl shadow hover:bg-pink-200 transition duration-300">April 19: One whole month of us!</div>
+      </section>
+      <section class="mb-8">
+        <h2 class="text-2xl font-semibold text-pink-500 mb-4">From Me to You</h2>
+        <p class="bg-white p-5 rounded-xl shadow text-gray-800 hover:shadow-lg transition duration-300">
+          Akshu, in just 30 days, you've brought a kind of warmth and joy into my life that words can barely explain. Even though we're far apart, you make my world feel close and full. This is just the beginning of something so special. I feel so lucky that I can call you mine.
+        </p>
+        <div class="mt-4 text-center text-pink-600 font-medium">
+          I wish I could be with you in person today. But until then, here’s a little corner of the internet that’s just for us.
+        </div>
+      </section>
+      <!-- Virtual Love Letter Section -->
+      <section class="mb-8 text-center">
+        <h2 class="text-2xl font-semibold text-pink-500 mb-4">A Letter for You, Akshu</h2>
+        <button id="letterBtn" class="px-6 py-3 bg-pink-500 text-white rounded-full hover:bg-pink-600 transition duration-300 shadow-lg hover:shadow-pink-300" aria-label="Open love letter">Open Your Love Letter 💌</button>
+        <div id="letterModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50" role="dialog" aria-labelledby="letterText">
+          <div class="bg-white p-6 rounded-xl shadow-2xl max-w-md text-center pop-animation relative">
+            <canvas id="letterCanvas" class="absolute inset-0"></canvas>
+            <p id="letterText" class="text-pink-600 text-lg font-medium">Akshu, my baby girl, you’re my forever. Every moment with you feels like a dream, and I can’t wait to write our future together. 💗</p>
+            <button onclick="closeLetter()" class="mt-4 px-4 py-2 bg-pink-500 text-white rounded-full hover:bg-pink-600 transition" aria-label="Close letter">Close</button>
+          </div>
+        </div>
+      </section>
+      <section class="mb-8">
+        <h2 class="text-2xl font-semibold text-pink-500 mb-2">Our Song</h2>
+        <p class="text-gray-700">Because to me, you really <span class="italic">are</span> what makes life beautiful.</p>
+        <div class="mt-4 rounded-xl overflow-hidden shadow hover:shadow-xl transition duration-300">
+          <iframe src="https://open.spotify.com/embed/track/4cluDES4hQEUhmXj6TXkSo?utm_source=generator" width="100%" height="80" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+        </div>
+      </section>
+      <!-- Love Meter Section -->
+      <section class="mb-8 text-center">
+        <h2 class="text-2xl font-semibold text-pink-500 mb-4">Our Love Meter</h2>
+        <div class="w-full bg-pink-100 rounded-full h-6 overflow-hidden relative">
+          <div id="loveMeter" class="bg-pink-500 h-6 rounded-full transition-all duration-2000" style="width: 0%"></div>
+          <canvas id="particleCanvas" class="absolute inset-0" style="pointer-events: none;"></canvas>
+        </div>
+        <button onclick="fillMeter()" class="mt-4 px-6 py-3 bg-pink-500 text-white rounded-full hover:bg-pink-600 transition duration-300 shadow-lg hover:scale-105" aria-label="Check our love meter">Check Our Love!</button>
+        <p id="meterText" class="mt-2 text-pink-600 font-medium"></p>
+      </section>
+      <!-- Reasons I Love You -->
+      <section class="mb-8">
+        <h2 class="text-2xl font-semibold text-pink-500 mb-4 text-center">10 Reasons Why I Love You</h2>
+        <div class="scroll-container flex overflow-x-auto space-x-4 snap-x pb-4">
+          <button class="nav-arrow left-0 bg-pink-500 text-white rounded-full w-10 h-10 flex items-center justify-center" onclick="scrollReasons(-200)" aria-label="Scroll left">←</button>
+          <div class="snap-center flex-shrink-0 w-64 bg-gradient-to-r from-pink-100 to-pink-200 rounded-xl shadow p-4 text-center hover:shadow-pink-300 transition reason-card" onclick="showReason(this.textContent)" aria-label="Reason 1">You make my heart smile.</div>
+          <div class="snap-center flex-shrink-0 w-64 bg-gradient-to-r from-pink-100 to-pink-200 rounded-xl shadow p-4 text-center hover:shadow-pink-300 transition reason-card" onclick="showReason(this.textContent)" aria-label="Reason 2">Your voice feels like home.</div>
+          <div class="snap-center flex-shrink-0 w-64 bg-gradient-to-r from-pink-100 to-pink-200 rounded-xl shadow p-4 text-center hover:shadow-pink-300 transition reason-card" onclick="showReason(this.textContent)" aria-label="Reason 3">You're my cute baby girl.</div>
+          <div class="snap-center flex-shrink-0 w-64 bg-gradient-to-r from-pink-100 to-pink-200 rounded-xl shadow p-4 text-center hover:shadow-pink-300 transition reason-card" onclick="showReason(this.textContent)" aria-label="Reason 4">You make distance feel shorter.</div>
+          <div class="snap-center flex-shrink-0 w-64 bg-gradient-to-r from-pink-100 to-pink-200 rounded-xl shadow p-4 text-center hover:shadow-pink-300 transition reason-card" onclick="showReason(this.textContent)" aria-label="Reason 5">You're effortlessly cute.</div>
+          <div class="snap-center flex-shrink-0 w-64 bg-gradient-to-r from-pink-100 to-pink-200 rounded-xl shadow p-4 text-center hover:shadow-pink-300 transition reason-card" onclick="showReason(this.textContent)" aria-label="Reason 6">I feel happy with you, even from afar.</div>
+          <div class="snap-center flex-shrink-0 w-64 bg-gradient-to-r from-pink-100 to-pink-200 rounded-xl shadow p-4 text-center hover:shadow-pink-300 transition reason-card" onclick="showReason(this.textContent)" aria-label="Reason 7">You bring light into my days.</div>
+          <div class="snap-center flex-shrink-0 w-64 bg-gradient-to-r from-pink-100 to-pink-200 rounded-xl shadow p-4 text-center hover:shadow-pink-300 transition reason-card" onclick="showReason(this.textContent)" aria-label="Reason 8">Your smile is addictive.</div>
+          <div class="snap-center flex-shrink-0 w-64 bg-gradient-to-r from-pink-100 to-pink-200 rounded-xl shadow p-4 text-center hover:shadow-pink-300 transition reason-card" onclick="showReason(this.textContent)" aria-label="Reason 9">You're my future wifeeeee.</div>
+          <div class="snap-center flex-shrink-0 w-64 bg-gradient-to-r from-pink-100 to-pink-200 rounded-xl shadow p-4 text-center hover:shadow-pink-300 transition reason-card" onclick="showReason(this.textContent)" aria-label="Reason 10">You're the best part of my every day.</div>
+          <button class="nav-arrow right-0 bg-pink-500 text-white rounded-full w-10 h-10 flex items-center justify-center" onclick="scrollReasons(200)" aria-label="Scroll right">→</button>
+        </div>
+        <!-- Pop-up Modal -->
+        <div id="reasonModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50" role="dialog" aria-labelledby="reasonText">
+          <div class="bg-white p-6 rounded-xl shadow-2xl max-w-sm text-center pop-animation">
+            <p id="reasonText" class="text-pink-600 text-lg font-medium"></p>
+            <p class="text-pink-500 mt-2">💗 Forever yours 💗</p>
+            <button onclick="closeReason()" class="mt-4 px-4 py-2 bg-pink-500 text-white rounded-full hover:bg-pink-600 transition" aria-label="Close modal">Close</button>
+          </div>
+        </div>
+      </section>
+      <section class="mb-8 text-center">
+        <button id="secretBtn" class="mt-6 px-6 py-3 bg-pink-500 text-white rounded-full text-lg hover:bg-pink-600 transition duration-300 shadow-lg hover:scale-105">Click me if you want to know a secret...</button>
+        <div id="secretMessage" class="mt-4 text-xl text-pink-700 font-semibold hidden transition-opacity duration-500">
+          I love you more every day, and I’m not planning on stopping anytime soon, and I'll never leave my baby girl.
+        </div>
+      </section>
+      <footer class="text-center py-4 text-sm text-gray-500">
+        Made with love for Akanshaaaa | 1 Month Strong
+      </footer>
+    </div>
+  </div>
+  <script>
+    // Intro Page Animation with Loading Message
+    const introPage = document.getElementById('introPage');
+    const mainContent = document.getElementById('mainContent');
+    const heart = document.getElementById('heart');
+    const loadingMessage = document.getElementById('loadingMessage');
+    const welcomeMessage = document.getElementById('welcomeMessage');
+    heart.addEventListener('click', () => {
+      loadingMessage.classList.add('visible');
+      setTimeout(() => {
+        introPage.classList.add('hidden');
+        mainContent.classList.add('visible');
+        welcomeMessage.classList.add('visible');
+        createConfetti();
+        setTimeout(() => welcomeMessage.classList.remove('visible'), 3000);
+      }, 500);
+    });
+
+    // Confetti Animation
+    function createConfetti() {
+      const canvas = document.getElementById('confettiCanvas');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      const ctx = canvas.getContext('2d');
+      const particles = [];
+      for (let i = 0; i < 30; i++) {
+        particles.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          vx: (Math.random() - 0.5) * 5,
+          vy: Math.random() * 5 - 5,
+          opacity: 1,
+        });
+      }
+      function animateConfetti() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach(p => {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.opacity -= 0.01;
+          if (p.opacity > 0) {
+            ctx.font = '16px Arial';
+            ctx.fillStyle = `rgba(236, 72, 153, ${p.opacity})`;
+            ctx.fillText('💗', p.x, p.y);
+          }
+        });
+        if (particles.some(p => p.opacity > 0)) {
+          requestAnimationFrame(animateConfetti);
+        } else {
+          canvas.style.display = 'none';
+        }
+      }
+      animateConfetti();
+    }
+
+    // Virtual Love Letter Animation
+    const letterBtn = document.getElementById('letterBtn');
+    const letterModal = document.getElementById('letterModal');
+    const letterText = document.getElementById('letterText');
+    letterBtn.addEventListener('click', () => {
+      letterModal.classList.remove('hidden');
+      animateLetterHearts();
+    });
+    function closeLetter() {
+      letterModal.classList.add('hidden');
+      letterText.style.animation = 'none';
+      setTimeout(() => {
+        letterText.style.animation = 'typewriter 4s steps(40) 1';
+      }, 10);
+    }
+    function animateLetterHearts() {
+      const canvas = document.getElementById('letterCanvas');
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+      const ctx = canvas.getContext('2d');
+      const particles = [];
+      for (let i = 0; i < 10; i++) {
+        const x = Math.random() * canvas.width;
+        particles.push({
+          x: x,
+          y: canvas.height,
+          vx: (Math.random() - 0.5) * 2,
+          vy: -Math.random() * 2 - 1,
+          opacity: 1,
+        });
+      }
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach(p => {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.opacity -= 0.005;
+          if (p.opacity > 0) {
+            ctx.font = '12px Arial';
+            ctx.fillStyle = `rgba(236, 72, 153, ${p.opacity})`;
+            ctx.fillText('💗', p.x, p.y);
+          }
+        });
+        if (particles.some(p => p.opacity > 0)) {
+          requestAnimationFrame(animate);
+        }
+      }
+      animate();
+    }
+
+    // Falling Emojis and Other Existing Scripts
+    const secretBtn = document.getElementById('secretBtn');
+    const secretMsg = document.getElementById('secretMessage');
+    secretBtn.addEventListener('click', () => {
+      secretMsg.classList.remove('hidden');
+      secretMsg.classList.add('opacity-100');
+    });
+    function showReason(text) {
+      document.getElementById('reasonText').textContent = text;
+      document.getElementById('reasonModal').classList.remove('hidden');
+    }
+    function closeReason() {
+      document.getElementById('reasonModal').classList.add('hidden');
+    }
+    function scrollReasons(amount) {
+      const container = document.querySelector('.scroll-container');
+      container.scrollBy({ left: amount, behavior: 'smooth' });
+    }
+    const reasonCards = document.querySelectorAll('.reason-card');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1 });
+    reasonCards.forEach(card => observer.observe(card));
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeReason();
+        closeLetter();
+      });
+    });
+
+    // Love Meter with Exploding Animation
+    function fillMeter() {
+      const meter = document.getElementById('loveMeter');
+      const meterText = document.getElementById('meterText');
+      const canvas = document.getElementById('particleCanvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+
+      // Fill to 100%
+      meter.style.width = '100%';
+
+      // Trigger explosion after fill
+      setTimeout(() => {
+        // Hide meter bar
+        meter.style.opacity = '0';
+        // Create heart particles
+        const particles = [];
+        for (let i = 0; i < 20; i++) {
+          particles.push({
+            x: canvas.width / 2,
+            y: canvas.height / 2,
+            vx: (Math.random() - 0.5) * 8,
+            vy: (Math.random() - 0.5) * 8,
+            opacity: 1,
+          });
+        }
+        function animateParticles() {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          particles.forEach(p => {
+            p.x += p.vx;
+            p.y += p.vy;
+            p.opacity -= 0.02;
+            if (p.opacity > 0) {
+              ctx.font = '16px Arial';
+              ctx.fillStyle = `rgba(236, 72, 153, ${p.opacity})`;
+              ctx.fillText('💗', p.x, p.y);
+            }
+          });
+          if (particles.some(p => p.opacity > 0)) {
+            requestAnimationFrame(animateParticles);
+          }
+        }
+        animateParticles();
+        // Show infinite message
+        meterText.textContent = "Akshu, our love broke the meter—it's infinite and beyond! 💖";
+      }, 2000);
+    }
+  </script>
+</body>
+</html>
