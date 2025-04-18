@@ -68,7 +68,90 @@
       transform: translateY(0);
     }
     .reason-card::before {
-      content: '💗';
+    #introPage {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom, #ffccd5, #fff0f5);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+  transition: opacity 0.5s ease-out;
+}
+#introPage.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+#heart {
+  font-size: min(10rem, 25vw);
+  color: #ec4899;
+  animation: pulse 1.5s infinite;
+  cursor: pointer;
+  text-shadow: 0 0 20px rgba(236, 72, 153, 0.5);
+  touch-action: manipulation;
+  user-select: none;
+}
+#loadingMessage {
+  position: absolute;
+  top: 50%;
+  transform: translateY(100px);
+  color: #ec4899;
+  font-size: 1.5rem;
+  font-weight: 600;
+  opacity: 0;
+  transition: opacity 0.3s ease-in;
+}
+#loadingMessage.visible {
+  opacity: 1;
+}
+#mainContent {
+  opacity: 0;
+  transform: translateY(100px);
+  transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+  position: relative;
+}
+#mainContent.visible {
+  opacity: 1;
+  transform: translateY(0);
+  animation: slideIn 0.5s ease-out;
+}
+#welcomeMessage {
+  position: absolute;
+  top: 10px;
+  width: 100%;
+  text-align: center;
+  color: #ec4899;
+  font-size: 1.5rem;
+  font-weight: 600;
+  opacity: 0;
+  transition: opacity 0.5s;
+}
+#welcomeMessage.visible {
+  opacity: 1;
+}
+#confettiCanvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 50;
+}
+@media (max-width: 400px) {
+  #heart {
+    font-size: 6rem;
+  }
+  #introPage p {
+    font-size: 1.25rem;
+  }
+  #loadingMessage {
+    font-size: 1rem;
+    transform: translateY(60px);
+  }
+  }  content: '💗';
       position: absolute;
       top: -10px;
       left: -10px;
@@ -93,58 +176,7 @@
     .pop-animation {
       animation: pop 0.3s ease-out;
     }
-    #introPage {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(to bottom, #ffccd5, #fff0f5);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      z-index: 100;
-      transition: opacity 0.5s ease-out;
-    }
-    #introPage.hidden {
-      opacity: 0;
-      pointer-events: none;
-    }
-    #heart {
-      font-size: 10rem;
-      color: #ec4899;
-      animation: pulse 1.5s infinite;
-      cursor: pointer;
-      text-shadow: 0 0 20px rgba(236, 72, 153, 0.5);
-    }
-    #mainContent {
-      opacity: 0;
-      transform: translateY(100px);
-      transition: opacity 0.5s ease-out, transform 0.5s ease-out;
-      position: relative;
-    }
-    #mainContent.visible {
-      opacity: 1;
-      transform: translateY(0);
-      animation: slideIn 0.5s ease-out;
-    }
-    .heart-particle {
-      position: absolute;
-      color: #ec4899;
-      font-size: 1rem;
-      animation: explode 1s ease-out forwards;
-    }
-    #loadingMessage {
-      position: absolute;
-      top: 50%;
-      transform: translateY(100px);
-      color: #ec4899;
-      font-size: 1.5rem;
-      font-weight: 600;
-      opacity: 0;
-      transition: opacity 0.5s;
-    }
+    
     #loadingMessage.visible {
       opacity: 1;
     }
